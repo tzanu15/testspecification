@@ -169,7 +169,11 @@ class GenericCommandPage(QWidget):
             print("⚠️ Error loading parameters file.")
 
     def add_command(self):
+        """Adaugă o nouă comandă și reîncărcăm categoriile de parametri pentru a include cele mai recente date."""
 
+        # 🔹 Reîncărcăm datele parametrilor înainte de a deschide dialogul
+        self.load_parameters()
+        print("🔹 Parameters reloaded before creating command:", self.parameters_data.keys())
         """Adaugă o nouă comandă cu dialog personalizat."""
         command_name, ok = QInputDialog.getText(self, "New Command", "Enter command name:")
         if not ok or not command_name.strip():

@@ -1,0 +1,72 @@
+{
+    "Request": {
+        "Req_Default": {
+            "Default Value": "[0x10,0x01]"
+        },
+        "Req_Extended": {
+            "Default Value": "[0x10,0x03]"
+        },
+        "Req_Programming": {
+            "Default Value": "[0x10,0x02]"
+        },
+        "Req_DID_Active": {
+            "Default Value": "[0x22, 0xF7, 0x23 ]"
+        }
+    },
+    "Response": {
+        "Req_Default": {
+            "Default Value": "[0x50,0x01]"
+        },
+        "Req_Extended": {
+            "Default Value": "[0x50,0x03]"
+        },
+        "Req_Programming": {
+            "Default Value": "[0x50,0x02]"
+        },
+        "Req_DID_Active": {
+            "Default Value": "[0x62, 0xF7, 0x23 ]"
+        }
+    },
+    "Signals": {
+        "Signal_1": {
+            "Default Value": "Bus/Signal_1"
+        },
+        "Signal_2": {
+            "Default Value": "Bus/Signal_2"
+        },
+        "Signal_3": {
+            "Default Value": "Bus/Signal_3"
+        },
+        "Signal_4": {
+            "Default Value": "Bus/Signal_4"
+        }
+    },
+    "Values": {
+        "Low_Value": {
+            "Default Value": "0"
+        },
+        "Mid_Value": {
+            "Default Value": "1"
+        },
+        "High_Value": {
+            "Default Value": "2"
+        },
+        "Nominal_Value": {
+            "Default Value": "3"
+        }
+    },
+    "CS_Variable": {
+        "CS_Variable_1": {
+            "Default Value": "0"
+        },
+        "CS_Variable_2": {
+            "Default Value": "1"
+        },
+        "CS_Variable_3": {
+            "Default Value": "2"
+        },
+        "CS_Variable_4": {
+            "Default Value": "3"
+        }
+    }
+}

@@ -1,0 +1,10 @@
+{
+    "New_Test": {
+        "Description": "SDSD",
+        "Precondition": "DSSDS",
+        "Action": ["1. Send request Req_Default","2. Set signal Signal_2 to value Low_Value"],
+        "Expected Results": ["1. Check response Req_Extended\"","2. Signal was set"],
+        "Test Data Description": "Variant Default: Req_Default = [0x50,0x10] Req_Extended =[0x50,0x03]  Signal_2 =Bus/Signal_2 Low_Value = 0",
+        "Description TCG": ""
+    }
+}

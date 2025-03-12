@@ -93,14 +93,34 @@ class ParametersPage(QWidget):
             self.parameters_data = {}
 
     def save_parameters(self):
-        """Salvează parametrii în fișierul JSON."""
+        """Salvează parametrii în JSON în timp real, forțând scrierea și sincronizarea."""
+        if not self.json_file:
+            print("❌ Error: json_file path is not set!")
+            return
+
         try:
-            with open(self.json_file, "w", encoding="utf-8") as file:
-                json.dump(self.parameters_data, file, indent=4)
-            print(f"✅ Parameters saved successfully to {self.json_file}")  # DEBUGGING
+            # 🔹 Debugging: verificăm structura datelor înainte de salvare
+            print("🔹 Saving parameters to JSON...")
+            print(json.dumps(self.parameters_data, indent=4))  # Afișează structura datelor în consolă
+
+            # 🔹 Creăm o copie curată a datelor, eliminând câmpuri inutile
+            cleaned_data = {}
+            for category, params in self.parameters_data.items():
+                cleaned_data[category] = {}
+                for param_name, param_data in params.items():
+                    cleaned_data[category][param_name] = {
+                        "Default Value": param_data.get("Default Value", ""),
+                    }
+
+            # 🔹 Scriem în fișier și forțăm salvarea imediată
+            with open(self.json_file , "w", encoding="utf-8") as file:
+                json.dump(cleaned_data, file, indent=4)
+                file.flush()  # Forțăm sincronizarea cu discul
+
+            print("✅ Parameters saved successfully in:", self.json_file )
+
         except Exception as e:
-            print(f"❌ Error saving parameters: {str(e)}")
-            QMessageBox.critical(self, "Error", f"An error occurred while saving parameters:\n{str(e)}")
+            print(f"❌ Error saving parameters: {e}")
 
     def populate_tabs(self):
         """Populează interfața cu datele din JSON la pornirea aplicației."""
@@ -174,12 +194,19 @@ class ParametersPage(QWidget):
         add_variant_button.clicked.connect(lambda: self.add_variant(parameter_table))
 
     def remove_category(self, index):
-        """Șterge o categorie selectată."""
-        reply = QMessageBox.question(self, "Delete Category", "Are you sure you want to delete this category?",
+        """Șterge o categorie din interfață și din JSON."""
+        category_name = self.tab_widget.tabText(index)
+
+        reply = QMessageBox.question(self, "Delete Category",
+                                     f"Are you sure you want to delete category '{category_name}'?",
                                      QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+
         if reply == QMessageBox.Yes:
-            self.tab_widget.removeTab(index)
-            self.save_parameters()
+            self.tab_widget.removeTab(index)  # Eliminăm categoria vizual
+            if category_name in self.parameters_data:
+                del self.parameters_data[category_name]  # Ștergem și din JSON
+
+            self.save_parameters()  # Salvăm JSON-ul actualizat
 
     def add_parameter(self, table, parameter_name_input):
         """Adaugă un nou parametru în tabel."""
@@ -323,10 +350,32 @@ class ParametersPage(QWidget):
             # 🔹 Adăugăm categoria și în interfață
             self.add_category(category_name, self.parameters_data[category_name])
 
-            QMessageBox.information(self, "Success",
-                                    f"Parameters from '{os.path.basename(file_path)}' have been imported successfully!")
-
         except Exception as e:
             QMessageBox.critical(self, "Import Failed", f"An error occurred during import:\n{str(e)}")
 
+    def delete_selected_parameter(self, table):
+        """Șterge un parametru selectat din tabel și JSON."""
+        selected_row = table.currentRow()
+
+        if selected_row == -1:
+            QMessageBox.warning(self, "No Parameter Selected", "Please select a parameter to delete.")
+            return
+
+        param_name_item = table.item(selected_row, 0)
+        if not param_name_item:
+            return
+
+        param_name = param_name_item.text()
+        category_name = self.tab_widget.tabText(self.tab_widget.currentIndex())
+
+        reply = QMessageBox.question(self, "Delete Parameter",
+                                     f"Are you sure you want to delete parameter '{param_name}'?",
+                                     QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+
+        if reply == QMessageBox.Yes:
+            table.removeRow(selected_row)  # Ștergem vizual rândul
+            if category_name in self.parameters_data and param_name in self.parameters_data[category_name]:
+                del self.parameters_data[category_name][param_name]  # Ștergem și din structura JSON
+
+            self.save_parameters()  # Salvăm JSON-ul actualizat
 

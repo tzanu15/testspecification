@@ -1,0 +1,18 @@
+{
+    "Set_signal": {
+        "Action": "Set signal {Signals} to value {Values}",
+        "Expected Result": "Signal was set"
+    },
+    "Check_Signal_equal": {
+        "Action": "Check if signal {Signals} is equal with value {Values}",
+        "Expected Result": "Signal is equal"
+    },
+    "Send_req_check_response": {
+        "Action": "Send request {Request}",
+        "Expected Result": "Check response {Response}"
+    },
+    "Check_CS_Var": {
+        "Action": "Check if variable {CS_Variable} is equal with {Values}",
+        "Expected Result": "Done"
+    }
+}
