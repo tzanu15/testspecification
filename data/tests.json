@@ -1,20 +1,84 @@
 {
-    "New_Test": {
-        "Description": "SDSD",
-        "Precondition": "DSSDS",
+    "New": {
+        "Description": "Test_Data_Description",
+        "Precondition": "Set",
         "Action": [
-            "1. Send request Req_Default",
-            "2. Set signal Signal_2 to value Low_Value",
-            "3. Set signal Signal_1 to value Mid_Value",
-            "4. Check if variable CS_Variable_1 is equal with Mid_Value"
+            "Check if variable CS_Variable_3 is equal with Low_Value"
         ],
         "Expected Results": [
-            "1. Check response Req_Extended\"",
-            "2. Signal was set",
-            "3. Signal was set",
-            "4. Done"
+            "Done"
         ],
-        "Test Data Description": "Signals = Signal_1 Values = Mid_Value",
-        "Description TCG": ""
+        "Test Data Description": [
+            "Default Value:",
+            "CS_Variable_3 = 2",
+            "Low_Value = 0",
+            "",
+            "Speed:",
+            "Low_Value = 12",
+            ""
+        ],
+        "Description TCG": [
+            "PRECONDITION:",
+            "1. Set",
+            "",
+            "ACTION:",
+            "1. Check if variable 'CS_Variable_3' is equal with 'Low_Value' Done"
+        ]
+    },
+    "New_2": {
+        "Description": "Test_Data_Description",
+        "Precondition": "Set",
+        "Action": [
+            "Check if variable CS_Variable_3 is equal with Low_Value"
+        ],
+        "Expected Results": [
+            "Done"
+        ],
+        "Test Data Description": [
+            "Default Value:",
+            "CS_Variable_3 = 2",
+            "Low_Value = 0",
+            "",
+            "Speed:",
+            "Low_Value = 12",
+            ""
+        ],
+        "Description TCG": [
+            "PRECONDITION:",
+            "1. Set",
+            "",
+            "ACTION:",
+            "1. Check if variable 'CS_Variable_3' is equal with 'Low_Value' Done"
+        ]
+    },
+    "New_1": {
+        "Description": "Test_Data_Description",
+        "Precondition": "Set",
+        "Action": [
+            "Check if variable CS_Variable_3 is equal with Low_Value",
+            "Check if signal Signal_1 is equal with value Low_Value"
+        ],
+        "Expected Results": [
+            "Done",
+            "Signal is equal"
+        ],
+        "Test Data Description": [
+            "Default Value:",
+            "CS_Variable_3 = 2",
+            "Low_Value = 0",
+            "Signal_1 = Bus/Signal_1",
+            "",
+            "Speed:",
+            "Low_Value = 12",
+            ""
+        ],
+        "Description TCG": [
+            "PRECONDITION:",
+            "1. Set",
+            "",
+            "ACTION:",
+            "1. Check if variable 'CS_Variable_3' is equal with 'Low_Value' Done",
+            "2. Check if signal 'Signal_1' is equal with value 'Low_Value' Signal is equal"
+        ]
     }
 }

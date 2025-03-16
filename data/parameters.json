@@ -1,30 +1,16 @@
 {
-    "Request": {
-        "Req_Default": {
-            "Default Value": "[0x10,0x01]"
-        },
-        "Req_Extended": {
-            "Default Value": "[0x10,0x03]"
-        },
-        "Req_Programming": {
-            "Default Value": "[0x10,0x02]"
-        },
-        "Req_DID_Active": {
-            "Default Value": "[0x22, 0xF7, 0x23 ]"
-        }
-    },
     "Response": {
         "Req_Default": {
-            "Default Value": "[0x50,0x01]"
+            "Default Value": "[0x50,0x01]",
+            "Variant": ""
         },
         "Req_Extended": {
-            "Default Value": "[0x50,0x03]"
-        },
-        "Req_Programming": {
-            "Default Value": "[0x50,0x02]"
+            "Default Value": "[0x50,0x03]",
+            "Variant": ""
         },
         "Req_DID_Active": {
-            "Default Value": "[0x62, 0xF7, 0x23 ]"
+            "Default Value": "[0x62, 0xF7, 0x23 ]",
+            "Variant": ""
         }
     },
     "Signals": {
@@ -41,18 +27,36 @@
             "Default Value": "Bus/Signal_4"
         }
     },
+    "Request": {
+        "Req_Default": {
+            "Default Value": "[0x10,0x01]"
+        },
+        "Req_Extended": {
+            "Default Value": "[0x10,0x03]"
+        },
+        "Req_Programming": {
+            "Default Value": "[0x10,0x02]"
+        },
+        "Req_DID_Active": {
+            "Default Value": "[0x22, 0xF7, 0x23 ]"
+        }
+    },
     "Values": {
         "Low_Value": {
-            "Default Value": "0"
+            "Default Value": "0",
+            "Speed": "12"
         },
         "Mid_Value": {
-            "Default Value": "1"
+            "Default Value": "1",
+            "Speed": ""
         },
         "High_Value": {
-            "Default Value": "2"
+            "Default Value": "2",
+            "Speed": ""
         },
         "Nominal_Value": {
-            "Default Value": "3"
+            "Default Value": "3",
+            "Speed": ""
         }
     },
     "CS_Variable": {

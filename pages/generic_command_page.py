@@ -3,7 +3,7 @@ import os
 from PyQt5.QtWidgets import (
     QWidget, QVBoxLayout, QPushButton, QTableWidget, QTableWidgetItem,
     QHBoxLayout, QLabel, QLineEdit, QHeaderView, QFrame, QTextEdit, QListWidget,
-    QDialog, QInputDialog,QMessageBox
+    QDialog, QInputDialog, QMessageBox, QMenu, QAction
 )
 from PyQt5.QtGui import QFont
 from PyQt5.QtCore import Qt
@@ -17,25 +17,6 @@ class CommandDialog(QDialog):
         self.setGeometry(300, 300, 400, 400)
 
         self.last_focused = None  # Variabilă pentru a reține ultimul câmp activ
-
-        self.setStyleSheet("""
-            QLabel { font-size: 14px; }
-            QTextEdit, QListWidget {
-                background-color: white;
-                border: 1px solid #ccc;
-                padding: 6px;
-                border-radius: 4px;
-            }
-            QPushButton {
-                background-color: #007BFF;
-                color: white;
-                font-size: 12px;
-                padding: 6px;
-                border-radius: 6px;
-                border: none;
-            }
-            QPushButton:hover { background-color: #0056b3; }
-        """)
 
         layout = QVBoxLayout()
 
@@ -92,27 +73,6 @@ class GenericCommandPage(QWidget):
         self.commands_data = {}
         self.parameters_data = {}
 
-        self.setStyleSheet("""
-            QWidget { background-color: #F8F9FA; }
-            QLabel { font-size: 14px; color: #333; }
-            QPushButton {
-                background-color: #007BFF;
-                color: white;
-                font-size: 12px;
-                padding: 6px;
-                border-radius: 6px;
-                border: none;
-            }
-            QPushButton:hover { background-color: #0056b3; }
-            QTableWidget { background-color: white; border: 1px solid #ddd; }
-            QLineEdit {
-                background-color: white;
-                border: 1px solid #ccc;
-                padding: 6px;
-                border-radius: 4px;
-            }
-        """)
-
         layout = QVBoxLayout()
 
         # 🔹 Titlu și separator
@@ -137,6 +97,8 @@ class GenericCommandPage(QWidget):
         self.command_table.setColumnCount(3)
         self.command_table.setHorizontalHeaderLabels(["Command Name", "Action", "Expected Result"])
         self.command_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        self.command_table.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.command_table.customContextMenuRequested.connect(self.show_context_menu)
         layout.addWidget(self.command_table)
 
         # 🔹 Butoane pentru acțiuni
@@ -158,7 +120,7 @@ class GenericCommandPage(QWidget):
         self.load_commands()
 
     def load_parameters(self):
-        """Încarcă categoriile de parametri din `parameters.json`."""
+        """Upload la categoriile de parametri din `parameters.json`."""
         if not os.path.exists(self.parameters_file):
             return
 
@@ -249,4 +211,54 @@ class GenericCommandPage(QWidget):
             if command_name in self.commands_data:
                 del self.commands_data[command_name]
                 self.save_commands()
+
+    def show_context_menu(self, position):
+        """ Afișează meniul contextual la click dreapta pe tabel """
+        index = self.command_table.indexAt(position)
+        print(index)
+        if not index.isValid():
+            return  # Dacă nu am dat click pe un rând valid, nu afișăm meniul
+
+        context_menu = QMenu(self)
+
+        edit_action = QAction("Edit Command", self)
+        edit_action.triggered.connect(self.edit_selected_command)
+        context_menu.addAction(edit_action)
+
+        delete_action = QAction("Delete Command", self)
+        delete_action.triggered.connect(self.delete_selected_command)
+        context_menu.addAction(delete_action)
+
+        context_menu.exec_(self.command_table.viewport().mapToGlobal(position))
+
+    def edit_selected_command(self):
+        """ Editează comanda selectată și actualizează tabelul și fișierul JSON """
+        selected_row = self.command_table.currentRow()
+        if selected_row == -1:
+            QMessageBox.warning(self, "No Command Selected", "Please select a command to edit.")
+            return
+
+        command_name = self.command_table.item(selected_row, 0).text()
+        action_text = self.command_table.item(selected_row, 1).text()
+        expected_text = self.command_table.item(selected_row, 2).text()
+
+        dialog = CommandDialog(self.parameters_data)
+        dialog.action_text.setText(action_text)
+        dialog.expected_text.setText(expected_text)
+
+        if dialog.exec_():
+            new_action = dialog.action_text.toPlainText()
+            new_expected = dialog.expected_text.toPlainText()
+
+            self.command_table.setItem(selected_row, 1, QTableWidgetItem(new_action))
+            self.command_table.setItem(selected_row, 2, QTableWidgetItem(new_expected))
+
+            self.commands_data[command_name] = {
+                "Action": new_action,
+                "Expected Result": new_expected
+            }
+
+            self.save_commands()
+
+
 

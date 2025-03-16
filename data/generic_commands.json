@@ -1,8 +1,4 @@
 {
-    "Set_signal": {
-        "Action": "Set signal {Signals} to value {Values}",
-        "Expected Result": "Signal was set"
-    },
     "Check_Signal_equal": {
         "Action": "Check if signal {Signals} is equal with value {Values}",
         "Expected Result": "Signal is equal"
