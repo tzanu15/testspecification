@@ -8,7 +8,7 @@
         "Expected Result": "Check response {Response}"
     },
     "Check_CS_Var": {
-        "Action": "Check if variable {CS_Variable} is equal with {Values}",
+        "Action": "Check if variable {Request} is equal with {CS_Variable}",
         "Expected Result": "Done"
     }
 }

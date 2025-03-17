@@ -8,6 +8,7 @@ from PyQt5.QtCore import Qt
 import json
 import os
 import pandas as pd
+import sys
 
 class ParametersPage(QWidget):
     def __init__(self):
@@ -15,7 +16,7 @@ class ParametersPage(QWidget):
 
         self.category_tables = {}
 
-        self.json_file = os.path.join(os.path.dirname(__file__), "../data/parameters.json")
+        self.json_file = self.get_resource_path("../data/parameters.json")
         self.load_parameters()
 
         layout = QVBoxLayout()
@@ -114,7 +115,7 @@ class ParametersPage(QWidget):
         print(f"✅ Pasted parameter: {new_param_name} in {category_name}")
 
     def duplicate_parameter(self, param_name, row, parameter_table, category_name):
-        """Duplicăm un parametru sub cel original."""
+        """Duplicates a parameter and inserts it immediately below the original in UI and JSON."""
         try:
             if category_name not in self.parameters_data:
                 print(f"❌ ERROR: Category '{category_name}' not found!")
@@ -124,6 +125,7 @@ class ParametersPage(QWidget):
                 print(f"❌ ERROR: Parameter '{param_name}' not found in category '{category_name}'!")
                 return
 
+            # ✅ Generate a unique parameter name
             count = 1
             new_param_name = f"{param_name}_{count}"
             while new_param_name in self.parameters_data[category_name]:
@@ -132,14 +134,28 @@ class ParametersPage(QWidget):
 
             print(f"📑 Duplicating parameter: {new_param_name} from {param_name} in {category_name}")
 
-            # ✅ Copiem parametrii și evităm referințele greșite
+            # ✅ Copy parameter data and avoid reference issues
             new_param_data = self.parameters_data[category_name][param_name].copy()
-            self.parameters_data[category_name][new_param_name] = new_param_data
 
-            # ✅ Adăugăm în UI
-            self.add_parameter_to_table(row + 1, new_param_name, new_param_data, parameter_table)
-            self.save_parameters()
-            print(f"✅ Duplicated parameter: {new_param_name} in {category_name}")
+            # ✅ Insert the new parameter in the dictionary **immediately after the original**
+            keys_list = list(self.parameters_data[category_name].keys())
+            param_index = keys_list.index(param_name)
+            updated_dict = {}
+
+            for key in keys_list:
+                updated_dict[key] = self.parameters_data[category_name][key]
+                if key == param_name:  # ✅ Insert duplicate immediately after original
+                    updated_dict[new_param_name] = new_param_data
+
+            self.parameters_data[category_name] = updated_dict
+
+            # ✅ Manually insert a new row in UI **without overwriting**
+            self.insert_parameter_in_ui(row+1, new_param_name, new_param_data, parameter_table)
+
+            # ✅ Save changes to JSON
+            #self.save_parameters(update_ui=False)  # 🔹 Prevents unnecessary UI refresh
+
+            print(f"✅ Duplicated parameter: {new_param_name} in category '{category_name}'")
 
         except Exception as e:
             print(f"❌ CRITICAL ERROR in `duplicate_parameter`: {e}")
@@ -220,29 +236,29 @@ class ParametersPage(QWidget):
             print(f"⚠️ Error: {self.json_file} is corrupted or empty.")
             self.parameters_data = {}
 
-    def save_parameters(self):
-        """Saves parameters correctly to JSON, ensuring valid structure."""
+    def save_parameters(self, update_ui=True):
+        """Saves parameters correctly to JSON and updates UI if needed."""
         if not self.json_file:
             print("❌ ERROR: json_file path is not set!")
             return
 
         try:
             print("🔹 Saving parameters to JSON...")
-
-            # ✅ Creating a cleaned data structure that follows the correct format
             cleaned_data = {}
             for category, params in self.parameters_data.items():
-                cleaned_data[category] = {}
-                for param_name, param_data in params.items():
-                    # ✅ Removing any unwanted "Parameter Name" keys
-                    cleaned_data[category][param_name] = {
-                        k: v for k, v in param_data.items() if k != "Parameter Name"
-                    }
+                cleaned_data[category] = {
+                    param_name: {k: v for k, v in param_data.items() if k != "Parameter Name"}
+                    for param_name, param_data in params.items()
+                }
 
             with open(self.json_file, "w", encoding="utf-8") as file:
                 json.dump(cleaned_data, file, indent=4)
 
             print(f"✅ Parameters saved successfully in: {self.json_file}")
+
+            # 🔹 Only reload UI if explicitly requested
+            if update_ui:
+                self.load_parameters()
 
         except Exception as e:
             print(f"❌ ERROR saving parameters: {e}")
@@ -267,6 +283,8 @@ class ParametersPage(QWidget):
         new_tab = QWidget()
         tab_layout = QVBoxLayout()
 
+
+
         # ✅ Layout for input field and add button
         input_layout = QHBoxLayout()
 
@@ -277,6 +295,14 @@ class ParametersPage(QWidget):
         input_layout.addWidget(parameter_name_input)
         input_layout.addWidget(add_parameter_button)
         tab_layout.addLayout(input_layout)
+        # ✅ Search Bar
+        search_layout = QHBoxLayout()
+        search_bar = QLineEdit()
+        search_bar.setPlaceholderText("🔍 Search parameters...")
+        search_bar.textChanged.connect(
+            lambda text: self.filter_parameters(text, parameter_table))  # Connect search function
+        search_layout.addWidget(search_bar)
+        tab_layout.addLayout(search_layout)
 
         # ✅ Create the parameter table
         parameter_table = QTableWidget()
@@ -292,7 +318,9 @@ class ParametersPage(QWidget):
             for param_name, values in parameters.items():
                 row_position = parameter_table.rowCount()
                 parameter_table.insertRow(row_position)
-                parameter_table.setItem(row_position, 0, QTableWidgetItem(param_name))
+                param_item = QTableWidgetItem(param_name)
+                param_item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+                parameter_table.setItem(row_position, 0, param_item )
 
                 for col_index, (variant_name, variant_value) in enumerate(values.items(), start=1):
                     parameter_table.setItem(row_position, col_index, QTableWidgetItem(str(variant_value)))
@@ -391,28 +419,34 @@ class ParametersPage(QWidget):
         except Exception as e:
             QMessageBox.critical(self, "Error", f"An error occurred while adding the parameter:\n{str(e)}")
 
-    def add_parameter_to_table(self, row, param_name, param_data, parameter_table):
-        """Adaugă un parametru nou în tabel fără să reîncarce toată lista."""
+    def insert_parameter_in_ui(self, row, param_name, param_data, parameter_table):
+        """Inserts a new parameter at the correct row without affecting other rows."""
         try:
-            if not parameter_table:
-                print("❌ ERROR: parameter_table is None!")
-                return
+            print(f"✅ Inserting parameter '{param_name}' at row {row}.")
 
-            print(f"✅ Adding parameter '{param_name}' at row {row}.")
-
+            # ✅ Step 1: Insert a new empty row **without affecting existing data**
             parameter_table.insertRow(row)
 
-            # 🔹 Numele parametrului (Read-Only)
+            # ✅ Step 2: Set the parameter name **ONLY in the new row**
             param_item = QTableWidgetItem(param_name)
-            param_item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
+            param_item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)  # Read-Only
             parameter_table.setItem(row, 0, param_item)
 
-            # 🔹 Default Value și variante
-            for col_index, (variant_name, variant_value) in enumerate(param_data.items(), start=1):
-                parameter_table.setItem(row, col_index, QTableWidgetItem(variant_value))
+            # ✅ Step 3: Populate additional columns **ONLY for the new row**, using correct column indexing
+            for col_index in range(1, parameter_table.columnCount()):  # Start at column 1 (skip "Parameter Name")
+                variant_name = parameter_table.horizontalHeaderItem(col_index).text()
+
+                # ✅ Get the correct value for this variant
+                variant_value = param_data.get(variant_name, "")  # Use empty string if variant does not exist
+
+                # ✅ Insert into the correct column
+                table_item = QTableWidgetItem(str(variant_value))
+                parameter_table.setItem(row, col_index, table_item)
+
+            print(f"✅ Successfully inserted '{param_name}' at row {row}.")
 
         except Exception as e:
-            print(f"❌ CRITICAL ERROR in `add_parameter_to_table`: {e}")
+            print(f"❌ ERROR in `insert_parameter_in_ui`: {e}")
             import traceback
             traceback.print_exc()
 
@@ -612,6 +646,25 @@ class ParametersPage(QWidget):
 
         except Exception as e:
             print(f"❌ ERROR reloading UI: {e}")
+
+    def filter_parameters(self, text, table):
+        """Filters parameters based on search input."""
+        text = text.strip().lower()  # Convert search text to lowercase
+
+        for row in range(table.rowCount()):
+            param_name_item = table.item(row, 0)  # Get the parameter name
+            if param_name_item:
+                param_name = param_name_item.text().strip().lower()
+                table.setRowHidden(row, text not in param_name)  # ✅ Hide rows that don't match
+
+    def get_resource_path(self,relative_path):
+        """Get the correct path whether running as a script or an executable."""
+        if getattr(sys, 'frozen', False):  # Running as compiled .exe
+            base_path = os.path.dirname(sys.executable) # Use folder where main.exe is
+        else:
+            base_path = os.path.abspath(os.path.dirname(__file__))  # Development mode
+
+        return os.path.join(base_path, relative_path)
 
 
 

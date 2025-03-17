@@ -1,5 +1,7 @@
 import json
 import os
+import sys
+
 from PyQt5.QtWidgets import (
     QWidget, QVBoxLayout, QPushButton, QTableWidget, QTableWidgetItem,
     QHBoxLayout, QLabel, QLineEdit, QHeaderView, QFrame, QTextEdit, QListWidget,
@@ -68,8 +70,8 @@ class GenericCommandPage(QWidget):
     def __init__(self):
         super().__init__()
         self.parameters_file = None
-        self.json_file = os.path.join(os.path.dirname(__file__), "../data/generic_commands.json")
-        self.parameters_file = os.path.join(os.path.dirname(__file__), "../data/parameters.json")
+        self.json_file = self.get_resource_path( "../data/generic_commands.json")
+        self.parameters_file = self.get_resource_path(  "../data/parameters.json")
         self.commands_data = {}
         self.parameters_data = {}
 
@@ -259,6 +261,15 @@ class GenericCommandPage(QWidget):
             }
 
             self.save_commands()
+
+    def get_resource_path(self, relative_path):
+        """Get the correct path whether running as a script or an executable."""
+        if getattr(sys, 'frozen', False):  # Running as compiled .exe
+            base_path = os.path.dirname(sys.executable) # Use folder where main.exe is
+        else:
+            base_path = os.path.abspath(os.path.dirname(__file__))  # Development mode
+
+        return os.path.join(base_path, relative_path)
 
 
 

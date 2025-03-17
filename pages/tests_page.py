@@ -1,6 +1,7 @@
 import copy
 import json
 import os
+import sys
 import traceback
 
 import pandas as pd
@@ -219,9 +220,9 @@ class TestsPage(QWidget):
 		self.copied_expected = None
 
 
-		self.json_file = os.path.join(os.path.dirname(__file__), "../data/tests.json")
-		self.commands_file = os.path.join(os.path.dirname(__file__), "../data/generic_commands.json")
-		self.parameters_file = os.path.join(os.path.dirname(__file__), "../data/parameters.json")
+		self.json_file = self.get_resource_path("../data/tests.json")
+		self.commands_file = self.get_resource_path("../data/generic_commands.json")
+		self.parameters_file = self.get_resource_path("../data/parameters.json")
 
 		# 🔹 Încărcăm datele necesare
 		self.tests_data = self.load_json(self.json_file)
@@ -251,8 +252,15 @@ class TestsPage(QWidget):
 		self.add_test_button = QPushButton("Add Test")
 		self.add_test_button.clicked.connect(self.add_test)
 		input_layout.addWidget(self.add_test_button)
-
 		layout.addLayout(input_layout)
+
+		# ✅ Search Bar for Tests
+		search_layout = QHBoxLayout()
+		search_bar = QLineEdit()
+		search_bar.setPlaceholderText("🔍 Search tests...")
+		search_bar.textChanged.connect(lambda text: self.filter_tests(text, self.test_table))  # Connect search function
+		search_layout.addWidget(search_bar)
+		layout.addLayout(search_layout)
 
 		# Butoane pentru Import/Export
 		button_layout = QHBoxLayout()
@@ -1152,6 +1160,26 @@ class TestsPage(QWidget):
 			print(f"❌ CRITICAL ERROR in `update_test_in_ui`: {e}")
 			import traceback
 			traceback.print_exc()
+
+	def filter_tests(self, text, table):
+		"""Filters tests based on search input."""
+		text = text.strip().lower()  # Convert search text to lowercase
+
+		for row in range(table.rowCount()):
+			test_name_item = table.item(row, 0)  # Get the test name
+			if test_name_item:
+				test_name = test_name_item.text().strip().lower()
+				table.setRowHidden(row, text not in test_name)  # ✅ Hide rows that don't match
+
+	def get_resource_path(self, relative_path):
+		"""Get the correct path whether running as a script or an executable."""
+		if getattr(sys, 'frozen', False):  # Running as compiled .exe
+			base_path = os.path.dirname(sys.executable) # Use folder where main.exe is
+		else:
+			base_path = os.path.abspath(os.path.dirname(__file__))  # Development mode
+
+		return os.path.join(base_path, relative_path)
+
 
 
 

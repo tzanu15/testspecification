@@ -3,7 +3,6 @@ from pages.tests_page import TestsPage
 from pages.parameters_page import ParametersPage
 from pages.generic_command_page import GenericCommandPage
 import sys
-import os
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -28,9 +27,6 @@ class MainWindow(QMainWindow):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-
-    with open("E:\\Python\\tool_test_specification\\utils\\style.qss", "r") as f:
-         app.setStyleSheet(f.read())
     window = MainWindow()
     window.show()
     sys.exit(app.exec_())

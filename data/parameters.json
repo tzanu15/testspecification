@@ -1,16 +1,34 @@
 {
     "Response": {
         "Req_Default": {
-            "Default Value": "[0x50,0x01]",
-            "Variant": ""
+            "Default Value": "[0x50,0x01]"
+        },
+        "Req_Default_2": {
+            "Default Value": "[0x50,0x01]"
+        },
+        "Req_Default_2_2": {
+            "Default Value": "[0x50,0x01]"
+        },
+        "Req_Default_2_2_1": {
+            "Default Value": "[0x50,0x01]"
+        },
+        "Req_Default_2_1": {
+            "Default Value": "[0x50,0x01]"
+        },
+        "Req_Default_1": {
+            "Default Value": "[0x50,0x01]"
+        },
+        "Req_Default_1_1": {
+            "Default Value": "[0x50,0x01]"
         },
         "Req_Extended": {
-            "Default Value": "[0x50,0x03]",
-            "Variant": ""
+            "Default Value": "[0x50,0x03]"
+        },
+        "Req_Extended_1": {
+            "Default Value": "[0x50,0x03]"
         },
         "Req_DID_Active": {
-            "Default Value": "[0x62, 0xF7, 0x23 ]",
-            "Variant": ""
+            "Default Value": "[0x62, 0xF7, 0x23 ]"
         }
     },
     "Signals": {
@@ -20,24 +38,36 @@
         "Signal_2": {
             "Default Value": "Bus/Signal_2"
         },
+        "Signal_2_2": {
+            "Default Value": "Bus/Signal_2"
+        },
+        "Signal_2_1": {
+            "Default Value": "Bus/Signal_2"
+        },
         "Signal_3": {
+            "Default Value": "Bus/Signal_3"
+        },
+        "Signal_3_1": {
             "Default Value": "Bus/Signal_3"
         },
         "Signal_4": {
             "Default Value": "Bus/Signal_4"
+        },
+        "Signal_4_1": {
+            "Default Value": "Bus/Signal_4"
         }
     },
     "Request": {
-        "Req_Default": {
+        "Res_Default": {
             "Default Value": "[0x10,0x01]"
         },
-        "Req_Extended": {
+        "Res_Extended": {
             "Default Value": "[0x10,0x03]"
         },
-        "Req_Programming": {
+        "Res_Programming": {
             "Default Value": "[0x10,0x02]"
         },
-        "Req_DID_Active": {
+        "Res_DID_Active": {
             "Default Value": "[0x22, 0xF7, 0x23 ]"
         }
     },
@@ -57,20 +87,6 @@
         "Nominal_Value": {
             "Default Value": "3",
             "Speed": ""
-        }
-    },
-    "CS_Variable": {
-        "CS_Variable_1": {
-            "Default Value": "0"
-        },
-        "CS_Variable_2": {
-            "Default Value": "1"
-        },
-        "CS_Variable_3": {
-            "Default Value": "2"
-        },
-        "CS_Variable_4": {
-            "Default Value": "3"
         }
     }
 }
